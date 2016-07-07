@@ -12,4 +12,4 @@ Meteor.publish("messages", function(skip, limit) {
         'skip' : skip,
         'limit' : limit
     });
-})
+});
