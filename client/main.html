@@ -32,11 +32,6 @@
 				var headAndFootH = $(".box-header").outerHeight(!0) + $(".box-footer").outerHeight(!0);
 				var dcm = $("#all-chat-messages");
 				dcm.height(winH - headAndFootH - 3 - (dcm.outerHeight() - dcm.height()));
-				
-				// setTimeout(function() {
-				// 	// dcm.animate({ scrollTop: $(".direct-chat-msg").last().scrollTop() }, 1000);
-				// 	dcm.scrollTop(dcm.prop("scrollHeight"));
-				// }, 1000);
 			}, 100);
 		});
 	</script>

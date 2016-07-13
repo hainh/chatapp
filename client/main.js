@@ -11,6 +11,8 @@ Meteor.subscribe("messages", 0, 5);
 
 import './main.html';
 
+var initialized = false;
+
 
 Template.messages.helpers({
   messages() {
@@ -18,7 +20,6 @@ Template.messages.helpers({
   },
 
   isMe(sender) {
-    console.log("sender = " + sender);
         return sender == document.getElementById("username").value;
   },
 
@@ -27,7 +28,6 @@ Template.messages.helpers({
 function getTime0(time) {
     var options;
     var now = new Date();
-    console.log(now.toLocaleDateString() , time.toLocaleDateString());
     if (now.toLocaleDateString() == time.toLocaleDateString()){
         options = { hour: "2-digit", minute: "2-digit", hour12: false };
     } else {
@@ -51,8 +51,21 @@ Template.messageRight.helpers({
     }
 });
 
-function scrollBottom() {
+var scheduled = false;
+
+window.scrollBottom = function scrollBottom() {
     var dcm = $("#all-chat-messages");
+    var messageH = $(".direct-chat-msg").outerHeight(true);
+    console.log(dcm[0].scrollHeight - dcm.scrollTop() , dcm.outerHeight(), messageH);
+
+    if (!scheduled) {
+        setTimeout(function() { initialized = true; }, 1000);
+        scheduled = true;
+    }
+
+    if (initialized && (dcm[0].scrollHeight - dcm.scrollTop()) - messageH > dcm.outerHeight()) {
+        return;
+    }
     dcm.scrollTop(dcm.prop("scrollHeight"));
 }
 
@@ -60,13 +73,11 @@ Template.messageLeft.rendered = scrollBottom;
 Template.messageRight.rendered = scrollBottom;
 
 window.sendMessage = function sendMessage(e) {
-    console.log(e.keyCode);
     if (e.keyCode !== 13) {
         return;
     }
     var sender = document.getElementById("username").value;
     var message = document.getElementById("message").value;
-    console.log(sender, message);
 
     if (sender.length < 3 || message < 2) {
         return;
@@ -75,6 +86,7 @@ window.sendMessage = function sendMessage(e) {
     localStorage.username = sender;
 
     document.getElementById("message").value = "";
+    initialized = true;
 
     ChatMessages.insert({time: new Date(), sender: sender, message : message });
 }
