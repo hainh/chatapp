@@ -6,36 +6,6 @@
 	<link rel="stylesheet" type="text/css" href="css/AdminLTE.min.css">
 	<link rel="stylesheet" type="text/css" href="css/skins/_all-skins.min.css">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
- 		integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
- 	<!-- <script src="js/app.js"></script> -->
- 	<script>
-		var AdminLTEOptions = {
-			sidebarExpandOnHover: false,
-			enableBoxRefresh: true,
-			enableBSToppltip: false,
-			directChat: {
-				enable: true
-			}
-		};
-
-		$(function() {
-			setTimeout(function() {
-				var username = localStorage.username;
-				if (username) {
-					$("#username").val(username);
-				}
-
-				var winH = $(window).height();
-				var headAndFootH = $(".box-header").outerHeight(!0) + $(".box-footer").outerHeight(!0);
-				var dcm = $("#all-chat-messages");
-				dcm.height(winH - headAndFootH - 3 - (dcm.outerHeight() - dcm.height()));
-			}, 100);
-		});
-	</script>
-
 	<style type="text/css">
 ::-webkit-scrollbar {
   width: 10px;
@@ -80,10 +50,34 @@
 		</div>
 	</div>
 </div>
+<script>
+	var AdminLTEOptions = {
+		sidebarExpandOnHover: false,
+		enableBoxRefresh: true,
+		enableBSToppltip: false,
+		directChat: {
+			enable: true
+		}
+	};
+
+	$(function() {
+		setTimeout(function() {
+			var username = localStorage.username;
+			if (username) {
+				$("#username").val(username);
+			}
+
+			var winH = $(window).height();
+			var headAndFootH = $(".box-header").outerHeight(!0) + $(".box-footer").outerHeight(!0);
+			var dcm = $("#all-chat-messages");
+			dcm.height(winH - headAndFootH - 3 - (dcm.outerHeight() - dcm.height()));
+		}, 100);
+	});
+</script>
 </body>
 
 <template name="messageLeft">
-	<div class="direct-chat-msg">
+	<div class="direct-chat-msg {{ hideThis }}">
 		<div class="direct-chat-info clearfix">
 			<span class="direct-chat-name pull-left">{{ sender }}</span>
 			<span class="direct-chat-timestamp pull-right">{{ getTime time }}</span>
@@ -96,7 +90,7 @@
 </template>
 
 <template name="messageRight">
-	<div class="direct-chat-msg right">
+	<div class="direct-chat-msg right {{ hideThis }}">
 		<div class="direct-chat-info clearfix">
 			<span class="direct-chat-name pull-right">{{ sender }}</span>
 			<span class="direct-chat-timestamp pull-left">{{ getTime time }}</span>

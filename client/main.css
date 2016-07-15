@@ -1,1 +1,4 @@
 /* CSS declarations go here */
+.transparent {
+	opacity: 0.2;
+}

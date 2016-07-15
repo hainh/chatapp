@@ -1,0 +1,1 @@
+export default messages_collection = "messages";
