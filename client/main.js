@@ -8,14 +8,15 @@ let ChatMessages = new Mongo.Collection(messages_collection);
 
 // ChatMessages.drop();
 
-window.ChatMessages = ChatMessages;
+// window.ChatMessages = ChatMessages;
 
-var findOptions = {
-    sort : { time : -1 },
-    limit : 15
-};
+var queryTime = new Date();
 
-Meteor.subscribe("messages", findOptions);
+function subscribe() {
+    Meteor.subscribe("messages", queryTime);
+}
+
+subscribe();
 
 import './main.html';
 
@@ -31,6 +32,26 @@ function findInMessages(id) {
     }
 }
 
+function zipMessages(all_messages){
+    for (var i = 0; i < all_messages.length; i++) {
+        var current_message = all_messages[i];
+        for (var j = i + 1; j < all_messages.length; j++) {
+            var next_message = all_messages[j];
+            if (current_message.sender === next_message.sender && inDuration(1800, current_message.time, next_message.time)) {
+                current_message.message += "\n" + next_message.message;
+                all_messages.splice(j, 1);
+                j--;
+            } else { 
+                break;
+            }
+        }
+    }
+}
+
+function inDuration(seconds, time, timeOfNext) {
+    return Math.abs(timeOfNext - time) < seconds * 1000;
+}
+
 Template.messages.helpers({
   messages() {
     var all_messages = ChatMessages.find({}, { sort : { time : 1 } }).fetch();
@@ -44,6 +65,12 @@ Template.messages.helpers({
     // }
     // old_messages = all_messages;
     // console.log(all_messages);
+    if (all_messages.length) {
+        queryTime = all_messages[0].time;
+    }
+
+    zipMessages(all_messages);
+    console.log(all_messages);
     return all_messages;
   },
 
@@ -79,9 +106,16 @@ Template.messageRight.helpers({
     }
 });
 
-window.scrollBottom = function scrollBottom(e) {
+window.onMessageRendered = function onMessageRendered(e) {
     var acm = $("#all-chat-messages");
     var messageH = $(".direct-chat-msg:last").outerHeight(true);
+    var $this = this;
+    escapeMessages($this);
+
+    this.autorun(function(e) {
+        // console.log($this.data);
+        // escapeMessages($this);
+    });
 
     // console.log(this);
     if (newMessage) {
@@ -105,8 +139,8 @@ window.scrollBottom = function scrollBottom(e) {
     acm.scrollTop(acm.prop("scrollHeight"));
 }
 
-Template.messageLeft.rendered = scrollBottom;
-Template.messageRight.rendered = scrollBottom;
+Template.messageLeft.rendered = onMessageRendered;
+Template.messageRight.rendered = onMessageRendered;
 
 Template.messages.rendered = function() {
     var acm = $("#all-chat-messages");
@@ -114,9 +148,8 @@ Template.messages.rendered = function() {
         initialized = !0;
 
         if (acm.scrollTop() === 0) {
-            findOptions.limit += moreCount;
             loadingMore = !0;
-            Meteor.subscribe("messages", findOptions);
+            subscribe();
         }
     }, 350);
 };
@@ -129,7 +162,7 @@ window.sendMessage = function sendMessage(e) {
     var sender = document.getElementById("username").value;
     var message = document.getElementById("message").value;
 
-    if (sender.length < 3 || message < 2) {
+    if (sender.length < 3 || message.length < 2) {
         return;
     }
 
@@ -138,11 +171,16 @@ window.sendMessage = function sendMessage(e) {
     document.getElementById("message").value = "";
 
     newMessage = true;
-    findOptions.limit++;
 
     ChatMessages.insert({time: new Date(), sender: sender, message : message });
-    Meteor.subscribe("messages", findOptions);
 };
+
+function escapeMessages(messageTemplate) {
+    var message = $(messageTemplate.firstNode).find(".direct-chat-text");
+    var html = message.text().replace(/\n/g, "<br/>");
+    console.log(html);
+    message.html(html);
+}
 
 (function ($) {
     var on = $.fn.on, timer;

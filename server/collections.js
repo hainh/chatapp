@@ -7,9 +7,28 @@ var database = new MongoInternals.RemoteCollectionDriver('mongodb://chatapp:123q
 let ChatMessages = new Mongo.Collection(messages_collection, { _driver : database, capped: true, size: 50000000, max: 500 });
 // ChatMessages.drop();
 
-Meteor.publish("messages", function(options) {
-    console.log(options);
-    var cursor = ChatMessages.find({}, options);
+let findOptions = {
+	sort : { time : -1 }
+}
+
+let lastDate = null;
+
+Meteor.publish("messages", function(date) {
+    console.log(date);
+
+    var _date = new Date(date);
+
+    if (lastDate === null || _date - lastDate !== 0) {
+    	var temps = ChatMessages.find({time : {$lte: _date}}, {sort: {time : -1}, limit : 25}).fetch();
+    	var last = temps[temps.length - 1];
+    	lastDate = last.time;
+    }
+
+    var query = {
+    	time : { $gte : lastDate }
+    };
+
+    var cursor = ChatMessages.find(query, findOptions);
     console.log(cursor.count());
     
     return cursor;
