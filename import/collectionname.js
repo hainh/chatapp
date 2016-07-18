@@ -1,1 +1,1 @@
-export default messages_collection = "messages_test";
+export default messages_collection = "messages";

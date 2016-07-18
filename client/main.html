@@ -83,7 +83,11 @@
 			<span class="direct-chat-timestamp pull-right">{{ getTime time }}</span>
 		</div><!-- /.direct-chat-info -->
 		<img class="direct-chat-img" src="img/logo.png" alt="message user image"><!-- /.direct-chat-img -->
-		<div class="direct-chat-text">{{ message }}</div><!-- /.direct-chat-text -->
+		<div class="direct-chat-text">
+			{{#each message }}
+			<div>{{ this }}</div>
+			{{/each}}
+		</div><!-- /.direct-chat-text -->
 	</div><!-- /.direct-chat-msg -->
 </template>
 
@@ -94,7 +98,11 @@
 			<span class="direct-chat-timestamp pull-left">{{ getTime time }}</span>
 		</div><!-- /.direct-chat-info -->
 		<img class="direct-chat-img" src="img/logo.png" alt="message user image"><!-- /.direct-chat-img -->
-		<div class="direct-chat-text">{{ message }}</div><!-- /.direct-chat-text -->
+		<div class="direct-chat-text">
+			{{#each message }}
+			<div>{{ this }}</div>
+			{{/each}}
+		</div><!-- /.direct-chat-text -->
 	</div><!-- /.direct-chat-msg -->
 </template>
 
